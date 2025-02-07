@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Basket</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            background: linear-gradient(135deg, #f5f5f5, #ffffff);
+            color: #333;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #ffffff !important;
+            padding: 10px 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .navbar-nav .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+            padding: 8px 12px;
+            transition: 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+
+        /* User Icon & Dropdown */
+        .user-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-icon {
+            width: 35px;
+            height: 35px;
+            background: #ff5e62;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+            display: none;
+            transition: 0.3s ease-in-out;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 15px;
+            text-align: left;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .dropdown-menu a:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Basket Items */
+        .basket-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .basket-item img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .item-details {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .item-details h5 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .item-details p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Basket Actions */
+        .item-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .update-btn, .remove-btn {
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .update-btn {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .update-btn:hover {
+            background-color: #218838;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px;
+        }
+
+        /* Total Price */
+        .total-price {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Place Order Button */
+        .place-order-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .place-order-btn:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav w-100 justify-content-center">
+                <li class="nav-item"><a class="nav-link active" href="/user">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user/basket">Basket</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user/orders">Orders</a></li>
+            </ul>
+        </div>
+
+        <!-- User Icon & Dropdown -->
+        <div class="user-dropdown">
+            <div class="user-icon">👤</div>
+            <span th:text="${username}">User</span>
+            <div class="dropdown-menu">
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="text-center my-4">Your Basket</h1>
+
+    <div th:if="${#lists.isEmpty(items)}" style="text-align: center;">
+        <p>Your basket is empty. Add some items to your basket!</p>
+        <a href="/user" class="btn btn-info">Go to Beverages</a>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(items)}">
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="/user" class="btn btn-secondary">Add More Beverages</a>
+        </div>
+        <div th:each="item : ${items}" class="basket-item">
+            <img th:src="@{${item.beverage.beveragePic}}" alt="Beverage Image">
+            <div class="item-details">
+                <h5 th:text="${item.beverage.name}"></h5>
+                <p th:text="'Price: €' + ${item.price}"></p>
+                <p th:text="'Quantity: ' + ${item.quantity}"></p>
+            </div>
+            <div class="item-actions">
+                <form th:action="@{/user/update-basket}" method="post">
+                    <input type="hidden" name="itemId" th:value="${item.id}" />
+                    <input type="number" name="quantity" th:value="${item.quantity}" min="1" />
+                    <button type="submit" class="update-btn">Update</button>
+                </form>
+                <form th:action="@{/user/remove-item}" method="post">
+                    <input type="hidden" name="itemId" th:value="${item.id}" />
+                    <button type="submit" class="remove-btn">Remove</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="total-price" th:if="${!#lists.isEmpty(items)}">
+        <h3 th:text="'Total: €' + ${totalPrice}"></h3>
+        <form action="/user/submit-order" method="post">
+            <button type="submit" class="place-order-btn">Place Order</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelector(".user-dropdown").addEventListener("click", function () {
+        document.querySelector(".dropdown-menu").classList.toggle("show");
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

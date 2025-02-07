@@ -16,12 +16,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.core.Authentication;
 
-
 import com.codeWithRaman.implementation.model.User;
 import com.codeWithRaman.implementation.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.access.AccessDeniedException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 public class SecurityConfig {
@@ -75,6 +81,9 @@ public class SecurityConfig {
 	                        .successHandler(customAuthenticationSuccessHandler())
 	                        .permitAll()
 	                )
+					.exceptionHandling(exceptionHandling -> exceptionHandling
+							.accessDeniedHandler(new CustomAccessDeniedHandler())
+					)
 	                .logout(logout -> logout
 	                        .logoutUrl("/logout")
 	                        .logoutSuccessUrl("/login")
@@ -92,15 +101,29 @@ public class SecurityConfig {
 				boolean isAdmin = authentication.getAuthorities().stream()
 						.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
-				// Redirecting to the appropriate dashboard
+				// Store the success message in the session
+				request.getSession().setAttribute("loginSuccess", "Login successful.");
+
+				// Redirect to the appropriate dashboard
 				if (isAdmin) {
-					response.sendRedirect("/admin?success=true");
+					response.sendRedirect("/admin");
 				} else {
-					response.sendRedirect("/user?success=true");
+					response.sendRedirect("/user");
 				}
 			}
 		};
 	}
+
+
+	public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+		@Override
+		public void handle(HttpServletRequest request, HttpServletResponse response,
+						   AccessDeniedException accessDeniedException) throws IOException, ServletException {
+			// Redirecting to the user dashboard or any other page
+			response.sendRedirect("/user");
+		}
+	}
+
 
 
 
